@@ -22,8 +22,6 @@ class ActionModule(ActionBase):
         host = host_vars['ansible_hostname']
         mode = self._task.args.get('mode', 'permissive')
 
-        print host_vars['groups']
-
         self._supports_check_mode = False # XXX ?
         self._supports_async = True
 
@@ -31,6 +29,7 @@ class ActionModule(ActionBase):
         result['_ansible_verbose_always'] = True
 
         try:
+            notario_store["groups"] = host_vars["groups"]
             notario.validate(host_vars, install_options, defined_keys=True)
 
             if host_vars["ceph_origin"] == "repository":
@@ -52,6 +51,13 @@ class ActionModule(ActionBase):
             notario_store["monitor_interface"] = host_vars.get("monitor_interface", None)
 
             notario.validate(host_vars, monitor_options, defined_keys=True)
+
+            notario_store["rados_address"] = host_vars.get("rados_address", None)
+            notario_store["rados_address_block"] = host_vars.get("rados_address_block", None)
+            notario_store["rados_interface"] = host_vars.get("rados_interface", None)
+
+            if host_vars["rgw_group_name"] in host_vars["groups"]:
+                notario.validate(host_vars, rados_options, defined_keys=True)
 
             # validate osd scenario setup
             notario.validate(host_vars, osd_options, defined_keys=True)
@@ -128,6 +134,20 @@ def validate_ceph_stable_release(value):
     assert value in ['jewel', 'kraken', 'luminous', 'mimic'], "ceph_stable_release must be set to 'jewel', 'kraken', 'lumious' or 'mimic'"
 
 
+def validate_rados_options(value):
+    """
+    Either radosgw_interface, radosgw_address or radosgw_address_block must
+    be defined.
+    """
+    rados_address_given = notario_store["rados_address"] != "address"
+    rados_address_block_given = notario_store["rados_address_block"] != "subnet"
+    rados_interface_given = notario_store["rados_interface"] != "interface"
+
+    msg = "Either rados_address, rados_address_block or rados_interface must be provided"
+
+    assert any([rados_address_given, rados_address_block_given, rados_interface_given]), msg
+
+
 install_options = (
     ("ceph_origin", ceph_origin_choices),
     ('osd_objectstore', osd_objectstore_choices),
@@ -159,6 +179,12 @@ monitor_options = (
     ("monitor_address_block", validate_monitor_options),
     ("monitor_interface", validate_monitor_options),
     ("public_network", types.string),
+)
+
+rados_options = (
+    ("rados_address", validate_rados_options),
+    ("rados_address_block", validate_rados_options),
+    ("rados_interface", validate_rados_options),
 )
 
 osd_options = (
