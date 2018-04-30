@@ -53,9 +53,9 @@ class ActionModule(ActionBase):
             if host_vars["mon_group_name"] in host_vars["group_names"]:
                 notario.validate(host_vars, monitor_options, defined_keys=True)
 
-            notario_store["rados_address"] = host_vars.get("rados_address", None)
-            notario_store["rados_address_block"] = host_vars.get("rados_address_block", None)
-            notario_store["rados_interface"] = host_vars.get("rados_interface", None)
+            notario_store["radosgw_address"] = host_vars.get("radosgw_address", None)
+            notario_store["radosgw_address_block"] = host_vars.get("radosgw_address_block", None)
+            notario_store["radosgw_interface"] = host_vars.get("radosgw_interface", None)
 
             if host_vars["rgw_group_name"] in host_vars["group_names"]:
                 notario.validate(host_vars, rados_options, defined_keys=True)
@@ -141,13 +141,13 @@ def validate_rados_options(value):
     Either radosgw_interface, radosgw_address or radosgw_address_block must
     be defined.
     """
-    rados_address_given = notario_store["rados_address"] != "address"
-    rados_address_block_given = notario_store["rados_address_block"] != "subnet"
-    rados_interface_given = notario_store["rados_interface"] != "interface"
+    radosgw_address_given = notario_store["radosgw_address"] != "address"
+    radosgw_address_block_given = notario_store["radosgw_address_block"] != "subnet"
+    radosgw_interface_given = notario_store["radosgw_interface"] != "interface"
 
-    msg = "Either rados_address, rados_address_block or rados_interface must be provided"
+    msg = "Either radosgw_address, radosgw_address_block or radosgw_interface must be provided"
 
-    assert any([rados_address_given, rados_address_block_given, rados_interface_given]), msg
+    assert any([radosgw_address_given, radosgw_address_block_given, radosgw_interface_given]), msg
 
 
 install_options = (
@@ -184,9 +184,9 @@ monitor_options = (
 )
 
 rados_options = (
-    ("rados_address", validate_rados_options),
-    ("rados_address_block", validate_rados_options),
-    ("rados_interface", validate_rados_options),
+    ("radosgw_address", validate_rados_options),
+    ("radosgw_address_block", validate_rados_options),
+    ("radosgw_interface", validate_rados_options),
 )
 
 osd_options = (
