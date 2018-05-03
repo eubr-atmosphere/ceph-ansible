@@ -2,17 +2,7 @@
 # Defines deployment design and assigns role to server groups
 
 - hosts:
-  - mons
-  - agents
-  - osds
-  - mdss
-  - rgws
-  - nfss
-  - restapis
-  - rbdmirrors
-  - clients
-  - iscsigws
-  - mgrs
+  - all
 
   gather_facts: false
   become: True
@@ -26,21 +16,14 @@
       when:
         - not delegate_facts_host | bool or inventory_hostname in groups.get('clients', [])
 
-    - name: monitors gather facts about everyone
+    - name: gather facts of all nodes
       setup:
       delegate_to: "{{ item }}"
       delegate_facts: True
       with_items: "{{ groups['all'] }}"
       when:
-        - inventory_hostname in groups.get('mons', [])
-
-    - name: everyone gathers facts about monitors
-      setup:
-      delegate_to: "{{ item }}"
-      delegate_facts: True
-      with_items: "{{ groups['mons'] }}"
-      when:
-        - inventory_hostname not in groups.get('mons', [])
+        - inventory_hostname == groups.get('all')[0]
+        - delegate_facts_host | bool
 
     - name: check if it is atomic host
       stat:
