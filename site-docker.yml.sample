@@ -26,13 +26,21 @@
       when:
         - not delegate_facts_host | bool or inventory_hostname in groups.get('clients', [])
 
-    - name: gather and delegate facts
+    - name: monitors gather facts about everyone
       setup:
       delegate_to: "{{ item }}"
       delegate_facts: True
-      with_items: "{{ groups['all'] | difference(groups.get('clients', [])) }}"
+      with_items: "{{ groups['all'] }}"
       when:
-        - delegate_facts_host | bool
+        - inventory_hostname in groups.get('mons', [])
+
+    - name: everyone gathers facts about monitors
+      setup:
+      delegate_to: "{{ item }}"
+      delegate_facts: True
+      with_items: "{{ groups['mons'] }}"
+      when:
+        - inventory_hostname not in groups.get('mons', [])
 
     - name: check if it is atomic host
       stat:
