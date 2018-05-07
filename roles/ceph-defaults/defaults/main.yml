@@ -499,13 +499,7 @@ ceph_docker_enable_centos_extra_repo: false
 ceph_docker_on_openstack: false
 ceph_mon_docker_interface: "interface" # backward compatibility with stable-2.2, will disappear in stable 3.1
 ceph_mon_docker_subnet: "0.0.0.0/0" # backward compatibility with stable-2.2, will disappear in stable 3.1
-mon_containerized_deployment: False # backward compatibility with stable-2.2, will disappear in stable 3.1
-osd_containerized_deployment: False # backward compatibility with stable-2.2, will disappear in stable 3.1
-mds_containerized_deployment: False # backward compatibility with stable-2.2, will disappear in stable 3.1
-rgw_containerized_deployment: False # backward compatibility with stable-2.2, will disappear in stable 3.1
-containerized_deployment: "{{ True if mon_containerized_deployment or osd_containerized_deployment or mds_containerized_deployment or rgw_containerized_deployment else False }}" # backward compatibility with stable-2.2, will disappear in stable 3.1
-
-
+containerized_deployment: False
 ############
 # KV store #
 ############
